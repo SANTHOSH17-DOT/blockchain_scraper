@@ -1,0 +1,33 @@
+{
+  "name": "blockchain_scraper",
+  "version": "1.0.0",
+  "description": "Blockchain resources scrapper using puppeteer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SANTHOSH17-DOT/blockchain_scraper.git"
+  },
+  "keywords": [
+    "blockchain",
+    "scrapper",
+    "nodejs",
+    "express",
+    "puppeteer"
+  ],
+  "author": "SANTHOSH17-DOT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SANTHOSH17-DOT/blockchain_scraper/issues"
+  },
+  "homepage": "https://github.com/SANTHOSH17-DOT/blockchain_scraper#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "node-cron": "^3.0.0",
+    "puppeteer": "^13.0.1"
+  }
+}
