@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer')
 
+const blogModel = require('./database/models/blogs')
 class scrape {
     constructor(url) {
         this.url = url
@@ -10,6 +11,12 @@ class scrape {
         await page.goto(this.url)
         const content = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('.postArticle-content > a')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const bloglink = new blogModel({
+                url
+            })
+            await bloglink.save()
         })
         console.log(content)
     }

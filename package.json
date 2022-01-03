@@ -28,6 +28,7 @@
     "chromium-revision": "^1.0.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.2",
+    "mongoose": "^6.1.4",
     "node-cron": "^3.0.0",
     "puppeteer": "^13.0.1"
   }
