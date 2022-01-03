@@ -1,11 +1,17 @@
-import puppeteer from 'puppeteer'
+const puppeteer = require('puppeteer')
 
 class scrape {
     constructor(url) {
         this.url = url
     }
     async blogs() {
-
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url)
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('.postArticle-content > a')).map(el => el.href)
+        })
+        console.log(content)
     }
     async learningCourses() {
 
@@ -20,10 +26,16 @@ class scrape {
 
     }
     async githubProjects() {
-
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url)
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('.repo-list-item a')).map(el => el.href)
+        })
+        console.log(content)
     }
     async linkedInPosts() {
 
     }
 }
-export const module = scrape
+module.exports = scrape
