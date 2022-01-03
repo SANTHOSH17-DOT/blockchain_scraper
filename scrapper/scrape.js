@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer')
 
-const blogModel = require('./database/models/blogs')
+const blogModel = require('../database/models/blogs')
 class scrape {
     constructor(url) {
         this.url = url
