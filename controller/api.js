@@ -7,5 +7,7 @@ router.get('/blog', async(req, res) => {
         data: blogData
     })
 })
+// router.get('/linkedIn',async(req,res)=>{
 
+// })
 module.exports = router
