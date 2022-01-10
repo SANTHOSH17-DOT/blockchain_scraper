@@ -5,7 +5,11 @@ const tagSchema = new mongoose.Schema({
         medium: [{ type: String }],
         hashnode: [{ type: String }],
         devTo: [{ type: String }]
-    }
+    },
+    projects: {
+        github: [{ type: String }]
+    },
+
 })
 
 module.exports = mongoose.model('Tag', tagSchema)

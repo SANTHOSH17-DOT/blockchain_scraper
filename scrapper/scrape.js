@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer')
-
+process.setMaxListeners(Infinity)
 const blogModel = require('../database/models/blogs')
+const projectModel = require('../database/models/projects')
 class scrape {
     constructor(url) {
         this.url = url
@@ -66,13 +67,20 @@ class scrape {
 
     }
     async githubProjects() {
-        // const browser = await puppeteer.launch()
-        // const page = await browser.newPage()
-        // await page.goto(this.url)
-        // const content = await page.evaluate(() => {
-        //     return Array.from(document.querySelectorAll('.repo-list-item a')).map(el => el.href)
-        // })
-        // console.log(content)
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('article > a')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const projectlink = new projectModel({
+                url
+            })
+            await projectlink.save()
+        })
+        console.log(content)
+        await browser.close()
     }
     async linkedInPosts() {
         // const browser = await puppeteer.launch()

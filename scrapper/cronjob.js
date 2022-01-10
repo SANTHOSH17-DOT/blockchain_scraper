@@ -19,25 +19,29 @@ const URLs = {
             element: '.crayons-story > a'
         }
     },
+    projectURLs: {
+        github: {
+            links: [],
+            element: 'article > a'
+        }
+    },
     linkedInURLs: 'https://www.linkedin.com/search/results/content/?keywords=blockchain',
-    githubURLs: 'https://github.com/search?q=blockchain',
     hackathonURLs: 'https://devpost.com/c/blockchain',
     tweetURLs: 'https://twitter.com/search?q=blockchain'
 }
 const addLinks = async() => {
     const tags = await Tag.find({})
     for (let platform of Object.keys(tags[0].blogs)) {
-        URLs.blogURLs[platform].links = [...tags[0].blogs[platform]]
-
+        URLs.blogURLs[platform].links = tags[0].blogs[platform]
     }
-
+    for (let platform of Object.keys(tags[0].projects)) {
+        URLs.projectURLs[platform].links = tags[0].projects[platform]
+    }
 }
 addLinks()
-    // console.log(URLs)
+
 cron.schedule('* * * * *', async() => {
     for (let blog of Object.keys(URLs.blogURLs)) {
-        // console.log(blog)
-
         for (let link of URLs.blogURLs[blog].links) {
             // const blogScrape = new scrape(link, URLs.blogURLs[blog].element)
             const blogScrape = new scrape(link)
@@ -45,11 +49,19 @@ cron.schedule('* * * * *', async() => {
                 blogScrape.mediumBlogs();
             } else if (blog == 'hashnode') {
                 blogScrape.hashnodeBlogs()
-            } else {
+            } else if (blog == 'devTo') {
                 blogScrape.devToBlogs()
             }
         }
 
+    }
+    for (let project of Object.keys(URLs.projectURLs)) {
+        for (let link of URLs.projectURLs[project].links) {
+            const projectScrape = new scrape(link)
+            if (project == 'github') {
+                projectScrape.githubProjects();
+            }
+        }
     }
 
 
