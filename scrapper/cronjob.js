@@ -26,8 +26,16 @@ const URLs = {
         }
     },
     linkedInURLs: 'https://www.linkedin.com/search/results/content/?keywords=blockchain',
-    hackathonURLs: 'https://devpost.com/c/blockchain',
-    tweetURLs: 'https://twitter.com/search?q=blockchain'
+    hackathonURLs: {
+        devpost: {
+            links: [],
+            element: '.hackathon-tile > a'
+        }
+    },
+    tweetURLs: {
+        links: ['https://twitter.com/hashtag/blockchain', 'https://twitter.com/hashtag/nft', 'https://twitter.com/hashtag/crypto'],
+        element: ''
+    }
 }
 const addLinks = async() => {
     const tags = await Tag.find({})
@@ -36,6 +44,9 @@ const addLinks = async() => {
     }
     for (let platform of Object.keys(tags[0].projects)) {
         URLs.projectURLs[platform].links = tags[0].projects[platform]
+    }
+    for (let platform of Object.keys(tags[0].hackathon)) {
+        URLs.hackathonURLs[platform].links = tags[0].hackathon[platform]
     }
 }
 addLinks()
@@ -63,12 +74,18 @@ cron.schedule('* * * * *', async() => {
             }
         }
     }
+    for (let hackathon of Object.keys(URLs.hackathonURLs)) {
+        for (let link of URLs.hackathonURLs[hackathon].links) {
+            const hackathonScrape = new scrape(link)
+            if (hackathon == 'devpost') {
+                hackathonScrape.devpostHacks();
+            }
+        }
+    }
 
 
     // const linkedInScrape = new scrape(URLs.linkedInURL)
     // linkedInScrape.linkedInPosts();
-    // const githubScrape = new scrape(URLs.githubURL)
-    // githubScrape.githubProjects();
     // const hackathonScrape = new scrape(URLs.hackathonURL)
     // hackathonScrape.hackathons();
     // const tweetScrape = new scrape(URLs.tweetURL)

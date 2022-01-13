@@ -9,6 +9,9 @@ const tagSchema = new mongoose.Schema({
     projects: {
         github: [{ type: String }]
     },
+    hackathon: {
+        devpost: [{ type: String }]
+    }
 
 })
 

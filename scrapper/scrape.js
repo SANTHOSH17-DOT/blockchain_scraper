@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer')
 process.setMaxListeners(Infinity)
 const blogModel = require('../database/models/blogs')
 const projectModel = require('../database/models/projects')
+const hackathonModel = require('../database/models/hackathon')
 class scrape {
     constructor(url) {
         this.url = url
@@ -63,8 +64,21 @@ class scrape {
     async tweets() {
 
     }
-    async hackathons() {
-
+    async devpostHacks() {
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+        const content = await page.evaluate(() => {
+                return Array.from(document.querySelectorAll('.hackathon-tile > a')).map(el => el.href)
+            })
+            content.forEach(async(url) => {
+                const hackathonlink = new hackathonModel({
+                    url
+                })
+                await hackathonlink.save()
+            })
+        console.log(content)
+        await browser.close()
     }
     async githubProjects() {
         const browser = await puppeteer.launch()
