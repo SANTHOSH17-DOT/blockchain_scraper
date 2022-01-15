@@ -31,6 +31,16 @@ const URLs = {
             element: '#video-title-link'
         }
     },
+    courseURLs: {
+        edX: {
+            links: [],
+            element: '.discovery-card-link'
+        },
+        coursera: {
+            links: [],
+            element: '.result-title-link'
+        }
+    },
     linkedInURLs: 'https://www.linkedin.com/search/results/content/?keywords=blockchain',
     hackathonURLs: {
         devpost: {
@@ -57,6 +67,9 @@ const addLinks = async() => {
     }
     for (let platform of Object.keys(tags[0].videos)) {
         URLs.videoURLs[platform].links = tags[0].videos[platform]
+    }
+    for (let platform of Object.keys(tags[0].courses)) {
+        URLs.courseURLs[platform].links = tags[0].courses[platform]
     }
 }
 addLinks()
@@ -100,7 +113,16 @@ cron.schedule('* * * * *', async() => {
             }
         }
     }
-
+    for (let course of Object.keys(URLs.courseURLs)) {
+        for (let link of URLs.courseURLs[course].links) {
+            const courseScrape = new scrape(link)
+            if (video == 'edX') {
+                courseScrape.edXcourses();
+            } else if (video == 'coursera') {
+                courseScrape.courseraCourses();
+            }
+        }
+    }
     // const linkedInScrape = new scrape(URLs.linkedInURL)
     // linkedInScrape.linkedInPosts();
     // const hackathonScrape = new scrape(URLs.hackathonURL)

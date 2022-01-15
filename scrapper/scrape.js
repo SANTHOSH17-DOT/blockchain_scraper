@@ -4,6 +4,7 @@ const blogModel = require('../database/models/blogs')
 const projectModel = require('../database/models/projects')
 const hackathonModel = require('../database/models/hackathon')
 const videoModel = require('../database/models/videos')
+const courseModel = require('../database/models/courses')
 class scrape {
     constructor(url) {
         this.url = url
@@ -109,6 +110,38 @@ class scrape {
                 url
             })
             await videolink.save()
+        })
+        console.log(content)
+        await browser.close()
+    }
+    async edXcourses() {
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('.discovery-card-link')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const courselink = new courseModel({
+                url
+            })
+            await courselink.save()
+        })
+        console.log(content)
+        await browser.close()
+    }
+    async courseraCourses() {
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('.result-title-link')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const courselink = new courseModel({
+                url
+            })
+            await courselink.save()
         })
         console.log(content)
         await browser.close()

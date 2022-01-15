@@ -14,6 +14,10 @@ const tagSchema = new mongoose.Schema({
     },
     videos: {
         youtube: [{ type: String }]
+    },
+    courses: {
+        edX: [{ type: String }],
+        coursera: [{ type: String }]
     }
 })
 
