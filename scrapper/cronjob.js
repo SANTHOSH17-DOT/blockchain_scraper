@@ -25,6 +25,12 @@ const URLs = {
             element: 'article > a'
         }
     },
+    videoURLs: {
+        youtube: {
+            links: [],
+            element: '#video-title-link'
+        }
+    },
     linkedInURLs: 'https://www.linkedin.com/search/results/content/?keywords=blockchain',
     hackathonURLs: {
         devpost: {
@@ -35,7 +41,8 @@ const URLs = {
     tweetURLs: {
         links: ['https://twitter.com/hashtag/blockchain', 'https://twitter.com/hashtag/nft', 'https://twitter.com/hashtag/crypto'],
         element: ''
-    }
+    },
+
 }
 const addLinks = async() => {
     const tags = await Tag.find({})
@@ -47,6 +54,9 @@ const addLinks = async() => {
     }
     for (let platform of Object.keys(tags[0].hackathon)) {
         URLs.hackathonURLs[platform].links = tags[0].hackathon[platform]
+    }
+    for (let platform of Object.keys(tags[0].videos)) {
+        URLs.videoURLs[platform].links = tags[0].videos[platform]
     }
 }
 addLinks()
@@ -82,7 +92,14 @@ cron.schedule('* * * * *', async() => {
             }
         }
     }
-
+    for (let video of Object.keys(URLs.videoURLs)) {
+        for (let link of URLs.videoURLs[video].links) {
+            const videoScrape = new scrape(link)
+            if (video == 'youtube') {
+                videoScrape.youtubeVideos();
+            }
+        }
+    }
 
     // const linkedInScrape = new scrape(URLs.linkedInURL)
     // linkedInScrape.linkedInPosts();

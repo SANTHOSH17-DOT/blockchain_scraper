@@ -3,6 +3,7 @@ process.setMaxListeners(Infinity)
 const blogModel = require('../database/models/blogs')
 const projectModel = require('../database/models/projects')
 const hackathonModel = require('../database/models/hackathon')
+const videoModel = require('../database/models/videos')
 class scrape {
     constructor(url) {
         this.url = url
@@ -69,14 +70,14 @@ class scrape {
         const page = await browser.newPage()
         await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
         const content = await page.evaluate(() => {
-                return Array.from(document.querySelectorAll('.hackathon-tile > a')).map(el => el.href)
+            return Array.from(document.querySelectorAll('.hackathon-tile > a')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const hackathonlink = new hackathonModel({
+                url
             })
-            content.forEach(async(url) => {
-                const hackathonlink = new hackathonModel({
-                    url
-                })
-                await hackathonlink.save()
-            })
+            await hackathonlink.save()
+        })
         console.log(content)
         await browser.close()
     }
@@ -92,6 +93,22 @@ class scrape {
                 url
             })
             await projectlink.save()
+        })
+        console.log(content)
+        await browser.close()
+    }
+    async youtubeVideos() {
+        const browser = await puppeteer.launch()
+        const page = await browser.newPage()
+        await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+        const content = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('#video-title-link')).map(el => el.href)
+        })
+        content.forEach(async(url) => {
+            const videolink = new videoModel({
+                url
+            })
+            await videolink.save()
         })
         console.log(content)
         await browser.close()

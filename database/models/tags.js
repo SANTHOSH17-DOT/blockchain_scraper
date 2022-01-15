@@ -11,8 +11,10 @@ const tagSchema = new mongoose.Schema({
     },
     hackathon: {
         devpost: [{ type: String }]
+    },
+    videos: {
+        youtube: [{ type: String }]
     }
-
 })
 
 module.exports = mongoose.model('Tag', tagSchema)
