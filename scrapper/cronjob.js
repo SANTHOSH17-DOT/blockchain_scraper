@@ -1,132 +1,102 @@
 const scrape = require('./scrape')
 const cron = require('node-cron')
 const Tag = require('../database/models/tags')
-    // Static urls
-    // For every minute
 
-const URLs = {
-    blogURLs: {
-        medium: {
-            links: [],
-            element: '.el > a'
-        },
-        hashnode: {
-            links: [],
-            element: 'h1 > a'
-        },
-        devTo: {
-            links: [],
-            element: '.crayons-story > a'
-        }
-    },
-    projectURLs: {
-        github: {
-            links: [],
-            element: 'article > a'
-        }
-    },
-    videoURLs: {
-        youtube: {
-            links: [],
-            element: '#video-title-link'
-        }
-    },
-    courseURLs: {
-        edX: {
-            links: [],
-            element: '.discovery-card-link'
-        },
-        coursera: {
-            links: [],
-            element: '.result-title-link'
-        }
-    },
-    linkedInURLs: 'https://www.linkedin.com/search/results/content/?keywords=blockchain',
-    hackathonURLs: {
-        devpost: {
-            links: [],
-            element: '.hackathon-tile > a'
-        }
-    },
-    tweetURLs: {
-        links: ['https://twitter.com/hashtag/blockchain', 'https://twitter.com/hashtag/nft', 'https://twitter.com/hashtag/crypto'],
-        element: ''
-    },
-
-}
-const addLinks = async() => {
-    const tags = await Tag.find({})
-    for (let platform of Object.keys(tags[0].blogs)) {
-        URLs.blogURLs[platform].links = tags[0].blogs[platform]
-    }
-    for (let platform of Object.keys(tags[0].projects)) {
-        URLs.projectURLs[platform].links = tags[0].projects[platform]
-    }
-    for (let platform of Object.keys(tags[0].hackathon)) {
-        URLs.hackathonURLs[platform].links = tags[0].hackathon[platform]
-    }
-    for (let platform of Object.keys(tags[0].videos)) {
-        URLs.videoURLs[platform].links = tags[0].videos[platform]
-    }
-    for (let platform of Object.keys(tags[0].courses)) {
-        URLs.courseURLs[platform].links = tags[0].courses[platform]
-    }
-}
-addLinks()
+// Static urls
+// For every minute
 
 cron.schedule('* * * * *', async() => {
-    for (let blog of Object.keys(URLs.blogURLs)) {
-        for (let link of URLs.blogURLs[blog].links) {
-            // const blogScrape = new scrape(link, URLs.blogURLs[blog].element)
-            const blogScrape = new scrape(link)
-            if (blog == 'medium') {
-                blogScrape.mediumBlogs();
-            } else if (blog == 'hashnode') {
-                blogScrape.hashnodeBlogs()
-            } else if (blog == 'devTo') {
-                blogScrape.devToBlogs()
-            }
-        }
+    try {
+        const tags = await Tag.find({})
+        for (let platform of Object.keys(tags[0].blogs)) {
 
-    }
-    for (let project of Object.keys(URLs.projectURLs)) {
-        for (let link of URLs.projectURLs[project].links) {
-            const projectScrape = new scrape(link)
-            if (project == 'github') {
-                projectScrape.githubProjects();
+            for (let tag of tags[0].blogs[platform]) {
+                if (platform == 'medium') {
+                    let link = `https://medium.com/tag/${tag}`
+                    const blogScrape = new scrape(link)
+                    blogScrape.mediumBlogs();
+                } else if (platform == 'hashnode') {
+                    let link = `https://hashnode.com/n/${tag}`
+                    const blogScrape = new scrape(link)
+                    blogScrape.hashnodeBlogs()
+                } else if (platform == 'devTo') {
+                    let link = `https://dev.to/t/${tag}`
+                    const blogScrape = new scrape(link)
+                    blogScrape.devToBlogs()
+                }
             }
+
         }
-    }
-    for (let hackathon of Object.keys(URLs.hackathonURLs)) {
-        for (let link of URLs.hackathonURLs[hackathon].links) {
-            const hackathonScrape = new scrape(link)
-            if (hackathon == 'devpost') {
-                hackathonScrape.devpostHacks();
+        for (let platform of Object.keys(tags[0].projects)) {
+
+            for (let tag of tags[0].projects[platform]) {
+                if (platform == 'github') {
+                    let link = `https://github.com/topics/${tag}`
+                    const projectScrape = new scrape(link)
+                    projectScrape.githubProjects();
+                }
             }
+
         }
-    }
-    for (let video of Object.keys(URLs.videoURLs)) {
-        for (let link of URLs.videoURLs[video].links) {
-            const videoScrape = new scrape(link)
-            if (video == 'youtube') {
-                videoScrape.youtubeVideos();
+        for (let platform of Object.keys(tags[0].hackathon)) {
+
+            for (let tag of tags[0].hackathon[platform]) {
+                if (platform == 'devpost') {
+                    let link = `https://devpost.com/c/${tag}`
+                    const hackathonScrape = new scrape(link)
+                    hackathonScrape.devpostHacks();
+                }
             }
+
         }
-    }
-    for (let course of Object.keys(URLs.courseURLs)) {
-        for (let link of URLs.courseURLs[course].links) {
-            const courseScrape = new scrape(link)
-            if (video == 'edX') {
-                courseScrape.edXcourses();
-            } else if (video == 'coursera') {
-                courseScrape.courseraCourses();
+        for (let platform of Object.keys(tags[0].videos)) {
+
+            for (let tag of tags[0].videos[platform]) {
+                if (platform == 'youtube') {
+                    let link = `https://www.youtube.com/hashtag/${tag}`
+                    const videoScrape = new scrape(link)
+                    videoScrape.youtubeVideos();
+                }
             }
+
         }
+        for (let platform of Object.keys(tags[0].courses)) {
+
+            for (let tag of tags[0].courses[platform]) {
+                if (platform == 'edX') {
+                    let link = `https://www.edx.org/learn/${tag}`
+                    const courseScrape = new scrape(link)
+                    courseScrape.edXcourses();
+                } else if (platform == 'coursera') {
+                    let link = `https://www.coursera.org/courses?query=${tag}`
+                    const courseScrape = new scrape(link)
+                    courseScrape.courseraCourses()
+                }
+                //  else if (platform == 'udemy') {
+                //     let link = `https://dev.to/t/${tag}`
+                //     const blogScrape = new scrape(link)
+                //     blogScrape.devToBlogs()
+                // }
+            }
+
+        }
+        for (let platform of Object.keys(tags[0].posts)) {
+
+            for (let tag of tags[0].posts[platform]) {
+                if (platform == 'twitter') {
+                    let link = tag
+                    const postScrape = new scrape(link)
+                    postScrape.twitterPosts();
+                }
+                // else if (posts == 'linkedIn') {
+                //     postScrape.linkedInPosts();
+                // } 
+            }
+
+        }
+        // ???????????????????????????????????????????????????????
+    } catch (err) {
+        console.log(err.message)
     }
-    // const linkedInScrape = new scrape(URLs.linkedInURL)
-    // linkedInScrape.linkedInPosts();
-    // const hackathonScrape = new scrape(URLs.hackathonURL)
-    // hackathonScrape.hackathons();
-    // const tweetScrape = new scrape(URLs.tweetURL)
-    // tweetScrape.tweets();
+
 })
