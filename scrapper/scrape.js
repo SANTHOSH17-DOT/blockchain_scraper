@@ -5,8 +5,10 @@ const projectModel = require('../database/models/projects')
 const hackathonModel = require('../database/models/hackathon')
 const videoModel = require('../database/models/videos')
 const courseModel = require('../database/models/courses')
+const udemyCourseModel = require('../database/models/udemy')
 const socialMediaPostsModel = require('../database/models/socialMediaPosts')
 const T = require('./twitConfig')
+const axios = require('axios')
 class scrape {
     constructor(url) {
         this.url = url
@@ -156,41 +158,46 @@ class scrape {
         }
     }
     async courseraCourses() {
-            try {
-                const browser = await puppeteer.launch()
-                const page = await browser.newPage()
-                await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
-                const content = await page.evaluate(() => {
-                    return Array.from(document.querySelectorAll('.result-title-link')).map(el => el.href)
+        try {
+            const browser = await puppeteer.launch()
+            const page = await browser.newPage()
+            await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
+            const content = await page.evaluate(() => {
+                return Array.from(document.querySelectorAll('.result-title-link')).map(el => el.href)
+            })
+            content.forEach(async(url) => {
+                const courselink = new courseModel({
+                    url
                 })
-                content.forEach(async(url) => {
-                    const courselink = new courseModel({
-                        url
-                    })
-                    await courselink.save()
-                })
-                console.log(content)
-                await browser.close()
-            } catch (err) {
-                console.log(err.message)
-            }
+                await courselink.save()
+            })
+            console.log(content)
+            await browser.close()
+        } catch (err) {
+            console.log(err.message)
         }
-        // async udemyCourses() {
-        //         const browser = await puppeteer.launch()
-        //         const page = await browser.newPage()
-        //         await page.goto(this.url, { waitUntil: 'load', timeout: 0 })
-        //         const content = await page.evaluate(() => {
-        //                 return Array.from(document.querySelectorAll('.udlite-custom-focus-visible')).map(el => el.href)
-        //             })
-        //             // content.forEach(async(url) => {
-        //             //     const courselink = new courseModel({
-        //             //         url
-        //             //     })
-        //             //     await courselink.save()
-        //             // })
-        //         console.log(content)
-        //         await browser.close()
-        //     }
+    }
+    async udemyCourses() {
+        try {
+            let res = await axios.get(this.url, {
+                headers: {
+                    'Accept': 'application/json,text/plain,*/*',
+                    'Authorization': 'Basic ' + process.env.UDEMY_AUTH,
+                    'Content-Type': 'application/json;charset=utf-8'
+                }
+            })
+            let courses = await res.data;
+            (courses.results).forEach(async(data) => {
+                const udemyCourse = new udemyCourseModel({
+                    data
+                })
+                await udemyCourse.save()
+            })
+            console.log(courses)
+        } catch (err) {
+            console.log(err.message);
+        }
+    }
     async twitterPosts() {
         try {
             T.get('search/tweets', { q: `${this.url} since:2011-07-11`, count: 10 }, async function(err, data, response) {

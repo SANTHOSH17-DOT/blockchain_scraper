@@ -4,6 +4,7 @@ const projectModel = require('../database/models/projects')
 const hackathonModel = require('../database/models/hackathon')
 const videoModel = require('../database/models/videos')
 const courseModel = require('../database/models/courses')
+const udemyModel = require('../database/models/udemy')
 const postsModel = require('../database/models/socialMediaPosts')
 
 router.get('/blog', async(req, res) => {
@@ -66,6 +67,20 @@ router.get('/courses', async(req, res) => {
         const courseData = await courseModel.find({})
         res.status(200).json({
             data: courseData
+        })
+    } catch (err) {
+        console.log(err.message)
+        res.status(500).json({
+            message: "Server error"
+        })
+    }
+
+})
+router.get('/udemy', async(req, res) => {
+    try {
+        const udemyData = await udemyModel.find({})
+        res.status(200).json({
+            data: udemyData
         })
     } catch (err) {
         console.log(err.message)

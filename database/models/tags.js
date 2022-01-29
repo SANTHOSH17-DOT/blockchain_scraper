@@ -17,7 +17,8 @@ const tagSchema = new mongoose.Schema({
     },
     courses: {
         edX: [{ type: String }],
-        coursera: [{ type: String }]
+        coursera: [{ type: String }],
+        udemy: [{ type: String }]
     },
     posts: {
         twitter: [{ type: String }]

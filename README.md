@@ -35,6 +35,12 @@ The scraped data is stored in the mongo database. Mongoose ODM is used for this 
   GET /api/courses
 ```
 
+#### Get all udemy courses
+
+```http
+  GET /api/udemy
+```
+
 #### Get all posts
 
 ```http

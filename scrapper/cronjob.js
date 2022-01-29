@@ -6,8 +6,10 @@ const Tag = require('../database/models/tags')
 // For every minute
 
 cron.schedule('* * * * *', async() => {
+
     try {
         const tags = await Tag.find({})
+
         for (let platform of Object.keys(tags[0].blogs)) {
 
             for (let tag of tags[0].blogs[platform]) {
@@ -72,14 +74,30 @@ cron.schedule('* * * * *', async() => {
                     const courseScrape = new scrape(link)
                     courseScrape.courseraCourses()
                 }
-                //  else if (platform == 'udemy') {
-                //     let link = `https://dev.to/t/${tag}`
-                //     const blogScrape = new scrape(link)
-                //     blogScrape.devToBlogs()
-                // }
             }
 
         }
+        for (let platform of Object.keys(tags[0].courses)) {
+
+            for (let tag of tags[0].courses[platform]) {
+                if (platform == 'edX') {
+                    let link = `https://www.edx.org/learn/${tag}`
+                    const courseScrape = new scrape(link)
+                    courseScrape.edXcourses();
+                } else if (platform == 'coursera') {
+                    let link = `https://www.coursera.org/courses?query=${tag}`
+                    const courseScrape = new scrape(link)
+                    courseScrape.courseraCourses()
+                } else if (platform == 'udemy') {
+                    let link = `https://www.udemy.com/api-2.0/courses/?page=1&page_size=50&search=${tag}`
+                    const udemyScrape = new scrape(link)
+                    udemyScrape.udemyCourses()
+                }
+            }
+
+        }
+
+
         for (let platform of Object.keys(tags[0].posts)) {
 
             for (let tag of tags[0].posts[platform]) {
@@ -94,9 +112,9 @@ cron.schedule('* * * * *', async() => {
             }
 
         }
-        // ???????????????????????????????????????????????????????
     } catch (err) {
         console.log(err.message)
     }
+
 
 })
